@@ -6,7 +6,111 @@
         xmlns:local="clr-namespace:DiskInformer"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+	<Window.Resources>
+		<Style TargetType="Button">
+			<Setter Property="Background" Value="White"></Setter>
+			<Setter Property="Margin" Value="5,3,0,1" />
+			<Setter Property="Width" Value="150" />
+			<Setter Property="Height" Value="24" />
+		</Style>
+		<Style TargetType="TextBlock">
+			<Setter Property="FontSize" Value="14" />
+		</Style>
+	</Window.Resources>
+	<ScrollViewer>
+	<Grid>
+		<StackPanel VerticalAlignment="Top" Height="35" Background="#7ea0d6">
+			<TextBlock Height="25" VerticalAlignment="Top" Margin="5,0,0,0" FontSize="16"> Физические диски</TextBlock>
+
+		</StackPanel>
+		<ListBox Background="#c3d8fa" Height="117" VerticalAlignment="Top" Margin="0,26,0,0">
+			<ListBox.ItemTemplate>
+				<DataTemplate>
+					<StackPanel Orientation="Horizontal">
+						<TextBlock></TextBlock>
+					</StackPanel>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
+		<Grid Height="190" VerticalAlignment="Top" Margin="5,149,0,0" >
+			<Grid.RowDefinitions >
+				<RowDefinition/>
+				<RowDefinition/>
+				<RowDefinition/>
+				<RowDefinition/>
+				<RowDefinition/>
+				<RowDefinition/>
+				<RowDefinition/>
+				<RowDefinition/>
+			</Grid.RowDefinitions>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition/>
+				<ColumnDefinition/>
+			</Grid.ColumnDefinitions>
+			<TextBlock Grid.Row="0">Производитель</TextBlock>
+			<TextBlock Grid.Row="1">Название</TextBlock>
+			<TextBlock Grid.Row="2">Максимальный вес</TextBlock>
+			<TextBlock Grid.Row="3">Размер</TextBlock>
+			<TextBlock Grid.Row="4">Скорость вращения</TextBlock>
+			<TextBlock Grid.Row="5">Интерфейс</TextBlock>
+			<TextBlock Grid.Row="6">Скорость данных</TextBlock>
+			<TextBlock Grid.Row="7">Объем буфера</TextBlock>
+
+			<TextBlock x:Name="Manufacturer" Grid.Row="0" Grid.Column="1"></TextBlock>
+			<TextBlock x:Name="Name" Grid.Row="1" Grid.Column="1"></TextBlock>
+			<TextBlock x:Name="MaximumWeight" Grid.Row="2" Grid.Column="1"></TextBlock>
+			<TextBlock x:Name="Size" Grid.Row="3" Grid.Column="1"></TextBlock>
+			<TextBlock x:Name="RotationalSpeed" Grid.Row="4" Grid.Column="1"></TextBlock>
+			<TextBlock x:Name="Interface" Grid.Row="5" Grid.Column="1"></TextBlock>
+			<TextBlock x:Name="DatRrate" Grid.Row="6" Grid.Column="1"></TextBlock>
+			<TextBlock x:Name="BufferVolume" Grid.Row="7" Grid.Column="1"></TextBlock>
+		</Grid>
+		<StackPanel VerticalAlignment="Top" Height="25" Background="#7ea0d6" Margin="0,338,0,0">
+			<TextBlock Height="26" VerticalAlignment="Top" Margin="5,0,0,0" FontSize="16">Логические диски</TextBlock>
+		</StackPanel>
+		<ListBox Background="#c3d8fa" Height="117" VerticalAlignment="Top" Margin="0,363,0,0">
+			<ListBox.ItemTemplate>
+				<DataTemplate>
+					<StackPanel Orientation="Horizontal">
+						<TextBlock></TextBlock>
+					</StackPanel>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
+		<Grid Height="190" VerticalAlignment="Top" Margin="5,489,0,0">
+			<Grid.RowDefinitions>
+				<RowDefinition/>
+				<RowDefinition/>
+				<RowDefinition/>
+				<RowDefinition/>
+				<RowDefinition/>
+				<RowDefinition/>
+				<RowDefinition/>
+			</Grid.RowDefinitions>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition/>
+				<ColumnDefinition/>
+			</Grid.ColumnDefinitions>
+			<TextBlock Grid.Row="0">Название</TextBlock>
+			<TextBlock Grid.Row="1">Объем</TextBlock>
+			<TextBlock Grid.Row="2">Свободное место</TextBlock>
+			<TextBlock Grid.Row="3">Занятое место</TextBlock>
+			<TextBlock Grid.Row="4">Имя файловой системы</TextBlock>
+			<TextBlock Grid.Row="5">Тип данный</TextBlock>
+			<TextBlock Grid.Row="6">Корневой элемент</TextBlock>
+
+			<TextBlock x:Name="LocalDriveName" Grid.Row="0" Grid.Column="1"></TextBlock>
+			<TextBlock x:Name="Volume" Grid.Row="1" Grid.Column="1"></TextBlock>
+			<TextBlock x:Name="FreePlace" Grid.Row="2" Grid.Column="1"></TextBlock>
+			<TextBlock x:Name="OccupiedSpace"
+Grid.Row="3" Grid.Column="1"></TextBlock>
+			<TextBlock x:Name="FileSystemName" Grid.Row="4" Grid.Column="1"></TextBlock>
+			<TextBlock x:Name="TypeGiven" Grid.Row="5" Grid.Column="1"></TextBlock>
+			<TextBlock x:Name="RootElement" Grid.Row="6" Grid.Column="1"></TextBlock>
+		</Grid>
+		<StackPanel VerticalAlignment="Top" Height="30" Background="#7ea0d6" Margin="0,675,0,0">
+				<Button HorizontalAlignment="Left" FontSize="16" Command="{Binding OpenStatisticWindow}">Посмотреть график</Button>
+		</StackPanel>
+	</Grid>
+	</ScrollViewer>
 </Window>

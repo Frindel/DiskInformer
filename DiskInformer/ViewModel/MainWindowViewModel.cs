@@ -1,20 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Management;
-using DiskInformer.Basic;
 using DiskInformer.Model;
+using DiskInformer.Basic;
 
 namespace DiskInformer.ViewModel
 {
-	internal class MainWindowViewModel : INotifyPropertyChanged
+	public class MainWindowViewModel : INotifyPropertyChanged
 	{
 		public event PropertyChangedEventHandler PropertyChanged;
 
 		private ObservableCollection<PhisicalDisk> _phisicalDisks;
-
+		private PhisicalDisk _selectedPhisicalDisk;
+		private LogicalDisk _selectedLogicalDisk;
 		#region property
 		public ObservableCollection<PhisicalDisk> PhisicalDisks
 		{
@@ -25,13 +25,31 @@ namespace DiskInformer.ViewModel
 				OnPropertyChanged(nameof(PhisicalDisks));
 			}
 		}
-		#endregion
-		#region command
-		public RelayCommand OpenStatisticWindow
+		public PhisicalDisk SelectedPhisicalDisk
 		{
-			get => new RelayCommand(()=>
+			get => _selectedPhisicalDisk;
+			set
 			{
-				View.StatisticsWindow statisticsWindow = new View.StatisticsWindow(5,100);
+				_selectedPhisicalDisk = value;
+				OnPropertyChanged(nameof(SelectedPhisicalDisk));
+			}
+		}
+		public LogicalDisk SelectedLogicalDisk
+		{
+			get => _selectedLogicalDisk;
+			set
+			{
+				_selectedLogicalDisk = value;
+				OnPropertyChanged(nameof(SelectedLogicalDisk));
+			}
+		}
+		#endregion
+		#region Commands
+		public RelayCommand DisplayStatisticsWindow
+		{
+			get => new RelayCommand(() =>
+			{
+				View.StatisticsWindow statisticsWindow = new View.StatisticsWindow(5, 100);
 				statisticsWindow.Show();
 				statisticsWindow.Focus();
 			});
@@ -42,40 +60,44 @@ namespace DiskInformer.ViewModel
 		public MainWindowViewModel()
 		{
 			_phisicalDisks = new ObservableCollection<PhisicalDisk>();
-			GetDiskInfo();
+			GetDisksInfo();
+			if (_phisicalDisks.Count != 0)
+				SelectedPhisicalDisk = _phisicalDisks[0];
+			if (SelectedPhisicalDisk.LogicalDisks.Count != 0)
+				SelectedLogicalDisk = SelectedPhisicalDisk.LogicalDisks[0];
 		}
 		#endregion
 
 		#region protected methods
-		/// <summary>
-		/// Geting current computer disks info
-		/// </summary>
-		private void GetDiskInfo()
+		private void GetDisksInfo()
 		{
 			ManagementObjectSearcher managment = new ManagementObjectSearcher("SELECT * FROM Win32_DiskDrive");
 			foreach (ManagementObject mo in managment.Get())
 			{
+				//получение информации о физическом диске
 				PhisicalDisk phisicalDisk = new PhisicalDisk(
-							(string)mo["Model"],
-							(int)(Convert.ToInt64(mo["Size"]) / 1073741824),
-							(int)Convert.ToInt64(mo["Partitions"]),
-							(int)Convert.ToInt64(mo["TotalCylinders"]),
-							(int)Convert.ToInt64(mo["TotalSectors"]),
-							(string)mo["SerialNumber"],
-							(string)mo["InterfaceType"]
-							);
+								(string)mo["Model"],
+								(int)(Convert.ToInt64(mo["Size"]) / 1073741824),
+								(int)Convert.ToInt64(mo["Partitions"]),
+								(int)Convert.ToInt64(mo["TotalCylinders"]),
+								(int)Convert.ToInt64(mo["TotalSectors"]),
+								(string)mo["SerialNumber"],
+								(string)mo["InterfaceType"]
+								);
 
 				foreach (ManagementObject b in mo.GetRelated("Win32_DiskPartition"))
 				{
 					foreach (ManagementBaseObject c in b.GetRelated("Win32_LogicalDisk"))
 					{
+						//получение информации о локальном диске
 						DriveInfo dr = new DriveInfo((string)c["Name"]);
+
 						phisicalDisk.LogicalDisks.Add(new LogicalDisk(
 						(string)c["Name"],
 						(int)(Convert.ToInt64(c["Size"]) / 1073741824),
 						(int)(Convert.ToInt64(dr.AvailableFreeSpace) / 1073741824),
-						((int)(Convert.ToInt64(c["Size"]) / 1073741824) - (int)(Convert.ToInt64(dr.AvailableFreeSpace) / 1073741824)),
-						(string)c["SystemName"],
+						(int)(Convert.ToInt64(c["Size"]) / 1073741824) - (int)(Convert.ToInt64(dr.AvailableFreeSpace) / 1073741824),
+						(string)c["Description"],
 						(string)c["FileSystem"]
 						));
 					}
@@ -83,11 +105,10 @@ namespace DiskInformer.ViewModel
 				_phisicalDisks.Add(phisicalDisk);
 			}
 		}
-
 		private void OnPropertyChanged(string propertyName)
 		{
 			if (PropertyChanged != null)
-				PropertyChanged.Invoke(propertyName, new PropertyChangedEventArgs(propertyName));
+				PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 		}
 		#endregion
 	}

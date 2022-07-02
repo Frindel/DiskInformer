@@ -111,9 +111,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Basic\Converters\TestTypeConverter.cs" />
     <Compile Include="Basic\RelayCommand.cs" />
     <Compile Include="Model\LogicalDisk.cs" />
-    <Compile Include="Model\PlotPoint.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="Model\PhisicalDisk.cs" />
     <Compile Include="ViewModel\StatisticsWindowViewModel.cs" />
@@ -164,9 +164,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Basic\Converters\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="License-LGPL.txt" />
   </ItemGroup>

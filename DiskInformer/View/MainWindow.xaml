@@ -31,7 +31,7 @@
 					</DataTemplate>
 				</ListBox.ItemTemplate>
 			</ListBox>
-			<Grid VerticalAlignment="Top" Margin="5,149,0,0" >
+			<Grid VerticalAlignment="Top" Margin="5,40,0,0" >
 				<Grid.RowDefinitions >
 					<RowDefinition/>
 					<RowDefinition/>

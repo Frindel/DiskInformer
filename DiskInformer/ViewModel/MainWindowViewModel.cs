@@ -49,7 +49,7 @@ namespace DiskInformer.ViewModel
 		{
 			get => new RelayCommand(() =>
 			{
-				View.StatisticsWindow statisticsWindow = new View.StatisticsWindow(5, 100);
+				View.StatisticsWindow statisticsWindow = new View.StatisticsWindow(5, 100,_phisicalDisks);
 				statisticsWindow.Show();
 				statisticsWindow.Focus();
 			});
@@ -76,14 +76,14 @@ namespace DiskInformer.ViewModel
 			{
 				//получение информации о физическом диске
 				PhisicalDisk phisicalDisk = new PhisicalDisk(
-								(string)mo["Model"],
-								(int)(Convert.ToInt64(mo["Size"]) / 1073741824),
-								(int)Convert.ToInt64(mo["Partitions"]),
-								(int)Convert.ToInt64(mo["TotalCylinders"]),
-								(int)Convert.ToInt64(mo["TotalSectors"]),
-								(string)mo["SerialNumber"],
-								(string)mo["InterfaceType"]
-								);
+				(string)mo["Model"],
+				(int)(Convert.ToInt64(mo["Size"]) / 1073741824),
+				(int)Convert.ToInt64(mo["Partitions"]),
+				(int)Convert.ToInt64(mo["TotalCylinders"]),
+				(int)Convert.ToInt64(mo["TotalSectors"]),
+				(string)mo["SerialNumber"],
+				(string)mo["InterfaceType"]
+				);
 
 				foreach (ManagementObject b in mo.GetRelated("Win32_DiskPartition"))
 				{

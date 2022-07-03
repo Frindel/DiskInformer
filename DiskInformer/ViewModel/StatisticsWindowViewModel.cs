@@ -1,21 +1,22 @@
-﻿using DiskInformer.View;
-using ScottPlot;
-using System.ComponentModel;
-using System.Timers;
-using System.Collections.Generic;
+﻿using DiskInformer.Basic;
 using DiskInformer.Model;
-using System.IO;
-using System.Collections.ObjectModel;
-using DiskInformer.Basic;
-using System.Text;
-using System.Diagnostics;
+using DiskInformer.View;
+using ScottPlot;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
+using System.Timers;
+using System.Linq;
 
 namespace DiskInformer.ViewModel
 {
 	public class StatisticsWindowViewModel : INotifyPropertyChanged
 	{
-		public enum TestType { Read,Write} 
+		public enum TestType { Read, Write }
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
@@ -27,9 +28,40 @@ namespace DiskInformer.ViewModel
 		private LogicalDisk _selectedLogicalDisk;
 		private TestType _testTypeAction;
 		private bool _testActive;
-		private List<double> _plotPoints; 
+		private List<double> _plotPoints;
+
+		private double _maxSpeed;
+		private double _currentSpeed;
+		private double _avgSpeed;
 
 		#region property
+		public double MaxSpeed
+		{
+			get => _maxSpeed;
+			set
+			{
+				_maxSpeed = value;
+				OnPropertyChanged(nameof(MaxSpeed));
+			}
+		}
+		public double CurrentSpeed
+		{
+			get => _currentSpeed;
+			set
+			{
+				_currentSpeed = value;
+				OnPropertyChanged(nameof(CurrentSpeed));
+			}
+		}
+		public double AvgSpeed
+		{
+			get => _avgSpeed;
+			set
+			{
+				_avgSpeed = value;
+				OnPropertyChanged(nameof(AvgSpeed));
+			}
+		}
 		public ObservableCollection<LogicalDisk> LogicalDisks
 		{
 			get => _logicalDisks;
@@ -62,21 +94,22 @@ namespace DiskInformer.ViewModel
 		#region Command
 		public RelayCommand StartTest
 		{
-			get => new RelayCommand(()=>
+			get => new RelayCommand(() =>
 			{
 				_plotPoints.Clear();
+				MaxSpeed = AvgSpeed=CurrentSpeed= 0;
 
 				//проверка существования файла
-				if (_testTypeAction == TestType.Read&&!File.Exists(_selectedLogicalDisk.Name+"\\\\FileForTestDisk"))
-				
+				if (_testTypeAction == TestType.Read && !File.Exists(_selectedLogicalDisk.Name + "\\\\FileForTestDisk"))
+
 				{
 					//создание файла, необходимого для тестирования записи
-					using (StreamWriter sw = new StreamWriter(_selectedLogicalDisk.Name+ "\\\\FileForTestDisk",true,Encoding.ASCII))
+					using (StreamWriter sw = new StreamWriter(_selectedLogicalDisk.Name + "\\\\FileForTestDisk", true, Encoding.ASCII))
 					{
 						//производится запись файла, размерностью 1 МБ с шагом в 8 байт
 						for (int i = 0; i < 131072; i++)
 						{
-							sw.Write(new string('t',8));
+							sw.Write(new string('t', 8));
 						}
 					}
 				}
@@ -89,6 +122,7 @@ namespace DiskInformer.ViewModel
 					{
 						((Timer)sender).Stop();
 						_testActive = false;
+						return;
 					}
 					ChangePlot();
 				};
@@ -96,20 +130,20 @@ namespace DiskInformer.ViewModel
 
 				_testActive = true;
 			},
-			()=> _selectedLogicalDisk != null);
+			() => !_testActive && _selectedLogicalDisk != null);
 		}
 		public RelayCommand StopTest
 		{
-			get => new RelayCommand(()=>
+			get => new RelayCommand(() =>
 			{
 				_testActive = false;
 			},
-			()=>_testActive);
+			() => _testActive);
 		}
 		#endregion
 
 		#region constructors
-		public StatisticsWindowViewModel(StatisticsWindow window, int updateTime, int dataSize,ICollection<PhisicalDisk> phisicalDisks)
+		public StatisticsWindowViewModel(StatisticsWindow window, int updateTime, int dataSize, ICollection<PhisicalDisk> phisicalDisks)
 		{
 			_testActive = false;
 			_plotPoints = new List<double>();
@@ -123,6 +157,8 @@ namespace DiskInformer.ViewModel
 
 			if (_logicalDisks.Count > 0)
 				SelectedLogialDisk = _logicalDisks[0];
+
+			MaxSpeed = AvgSpeed = CurrentSpeed = 0;
 
 			//настройка графика
 			WpfPlot plot = window.plot;
@@ -166,7 +202,13 @@ namespace DiskInformer.ViewModel
 				}
 			}
 			double rez = 1048576 / sv.Elapsed.TotalMilliseconds * 0.001;
-			_plotPoints.Add(Math.Round(rez,1));
+			_plotPoints.Add(Math.Round(rez, 2));
+
+			CurrentSpeed = Math.Round(rez, 2);
+			if (MaxSpeed<CurrentSpeed)
+				MaxSpeed = CurrentSpeed;
+
+			AvgSpeed = Math.Round(_plotPoints.Sum() / _plotPoints.Count,2);
 
 			//edit plot
 			WpfPlot plot = _window.plot;
@@ -174,11 +216,12 @@ namespace DiskInformer.ViewModel
 			double[] dataY = _plotPoints.ToArray();
 			double[] dataX = new double[_plotPoints.Count];
 			for (int i = 0; i < _plotPoints.Count; i++)
-				dataX[i] = i+1;
+				dataX[i] = i + 1;
+
 
 			plot.Plot.AddScatter(dataX, dataY);
 
-			_window.Dispatcher.Invoke(()=>plot.Refresh());
+			_window.Dispatcher.Invoke(() => plot.Refresh());
 		}
 		private void OnPropertyChanged(string propertyName)
 		{

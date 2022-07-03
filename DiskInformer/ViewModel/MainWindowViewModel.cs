@@ -49,7 +49,7 @@ namespace DiskInformer.ViewModel
 		{
 			get => new RelayCommand(() =>
 			{
-				View.StatisticsWindow statisticsWindow = new View.StatisticsWindow(5, 100,_phisicalDisks);
+				View.StatisticsWindow statisticsWindow = new View.StatisticsWindow(2, 100,_phisicalDisks);
 				statisticsWindow.Show();
 				statisticsWindow.Focus();
 			});

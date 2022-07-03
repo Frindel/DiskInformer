@@ -1,14 +1,14 @@
 ﻿<Window x:Class="DiskInformer.View.StatisticsWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:DiskInformer.View"
+xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+xmlns:local="clr-namespace:DiskInformer.View"
 xmlns:l="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
 xmlns:b="clr-namespace:DiskInformer.Basic.Converters"
-        mc:Ignorable="d"
-        Title="StatisticsWindow" Height="455" Width="800">
-<Window.Resources>
+mc:Ignorable="d"
+Title="StatisticsWindow" Height="455" Width="1000">
+	<Window.Resources>
 		<b:TestTypeConverter x:Key="testTypeConverter"/>
 	</Window.Resources>
 	<Grid>
@@ -22,7 +22,17 @@ xmlns:b="clr-namespace:DiskInformer.Basic.Converters"
 					</DataTemplate>
 				</ListBox.ItemTemplate>
 			</ListBox>
-			<WpfPlot Height="300" x:Name="plot"/>
+			<Grid>
+				<WpfPlot HorizontalAlignment="Left" Height="300" Width="800" x:Name="plot"/>
+				<StackPanel HorizontalAlignment="Right" Width="200" Margin="0,30">
+					<TextBlock Width="200" FontSize="16" >Текущая скорость:</TextBlock>
+					<TextBlock Text="{Binding CurrentSpeed}" Width="200" FontSize="16"></TextBlock>
+					<TextBlock Width="200" FontSize="16">Средняя скорость:</TextBlock>
+					<TextBlock Text="{Binding AvgSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="200" FontSize="16"></TextBlock>
+					<TextBlock Width="200" FontSize="16">Максимальная скорость:</TextBlock>
+					<TextBlock Text="{Binding MaxSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="200" FontSize="16"></TextBlock>
+				</StackPanel>
+			</Grid>
 			<WrapPanel Height="40" Background="#7ea0d6">
 				<ComboBox SelectedIndex="{Binding TestTypeAction,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource testTypeConverter}}" Margin="5,3,0,0" HorizontalAlignment="Left" Width="170" FontSize="16">
 					<ComboBoxItem Tag="Read">Скорость чтения</ComboBoxItem>

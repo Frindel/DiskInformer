@@ -5,9 +5,32 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DiskInformer.View"
 xmlns:l="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+xmlns:b="clr-namespace:DiskInformer.Basic.Converters"
         mc:Ignorable="d"
-        Title="StatisticsWindow" Height="450" Width="800">
+        Title="StatisticsWindow" Height="455" Width="800">
+<Window.Resources>
+		<b:TestTypeConverter x:Key="testTypeConverter"/>
+	</Window.Resources>
 	<Grid>
-		<WpfPlot x:Name="plot"/>
+		<StackPanel>
+			<ListBox ItemsSource="{Binding LogicalDisks}" SelectedItem="{Binding SelectedLogialDisk, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Background="#c3d8fa" MinHeight="80" VerticalAlignment="Top" Margin="0,0,0,2">
+				<ListBox.ItemTemplate>
+					<DataTemplate>
+						<StackPanel Orientation="Horizontal">
+							<TextBlock Text="{Binding Name}"></TextBlock>
+						</StackPanel>
+					</DataTemplate>
+				</ListBox.ItemTemplate>
+			</ListBox>
+			<WpfPlot Height="300" x:Name="plot"/>
+			<WrapPanel Height="40" Background="#7ea0d6">
+				<ComboBox SelectedIndex="{Binding TestTypeAction,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource testTypeConverter}}" Margin="5,3,0,0" HorizontalAlignment="Left" Width="170" FontSize="16">
+					<ComboBoxItem Tag="Read">Скорость чтения</ComboBoxItem>
+					<ComboBoxItem Tag="Write">Скорость записи</ComboBoxItem>
+				</ComboBox>
+				<Button Content="Старт" Width="100" Command="{Binding StartTest}"/>
+				<Button Content="Стоп" Width="100" Command="{Binding StopTest}"/>
+			</WrapPanel>
+		</StackPanel>
 	</Grid>
 </Window>

@@ -19,90 +19,101 @@
 	</Window.Resources>
 	<ScrollViewer>
 		<Grid>
-			<StackPanel VerticalAlignment="Top" Height="35" Background="#7ea0d6">
-				<TextBlock Height="25" VerticalAlignment="Top" Margin="5,0,0,0" FontSize="16"> Физические диски</TextBlock>
-			</StackPanel>
-			<ListBox ItemsSource="{Binding PhisicalDisks}" SelectedItem="{Binding SelectedPhisicalDisk,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Background="#c3d8fa" VerticalAlignment="Top" Margin="0,26,0,0">
-				<ListBox.ItemTemplate>
-					<DataTemplate>
-						<StackPanel Orientation="Horizontal">
-							<TextBlock Text="{Binding Name}"></TextBlock>
-						</StackPanel>
-					</DataTemplate>
-				</ListBox.ItemTemplate>
-			</ListBox>
-			<Grid VerticalAlignment="Top" Margin="5,40,0,0" >
-				<Grid.RowDefinitions >
-					<RowDefinition/>
-					<RowDefinition/>
-					<RowDefinition/>
-					<RowDefinition/>
-					<RowDefinition/>
-					<RowDefinition/>
-					<RowDefinition/>
-				</Grid.RowDefinitions>
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition/>
-					<ColumnDefinition/>
-				</Grid.ColumnDefinitions>
-				<TextBlock Grid.Row="0">Модель</TextBlock>
-				<TextBlock Grid.Row="1">Объем данных</TextBlock>
-				<TextBlock Grid.Row="2">Колличество разделов</TextBlock>
-				<TextBlock Grid.Row="3">Колличество цилиндров</TextBlock>
-				<TextBlock Grid.Row="4">Колличество секторов</TextBlock>
-				<TextBlock Grid.Row="5">Серийный номер</TextBlock>
-				<TextBlock Grid.Row="6">Тип интерфейса</TextBlock>
+			<Grid.RowDefinitions>
+				<RowDefinition/>
+				<RowDefinition/>
+			</Grid.RowDefinitions>
+			<StackPanel VerticalAlignment="Top" Grid.Row="0" >
+				<StackPanel Background="#7ea0d6">
+					<TextBlock Height="25" VerticalAlignment="Top" Margin="5,0,0,0" FontSize="16"> Физические диски</TextBlock>
+				</StackPanel>
+				<ListBox ItemsSource="{Binding PhisicalDisks}" SelectedItem="{Binding SelectedPhisicalDisk,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Background="#c3d8fa" MinHeight="80" VerticalAlignment="Top" Margin="0,0,0,2">
+					<ListBox.ItemTemplate>
+						<DataTemplate>
+							<StackPanel Orientation="Horizontal">
+								<TextBlock Text="{Binding Name}"></TextBlock>
+							</StackPanel>
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>
+				<Grid VerticalAlignment="Top" >
+					<Grid.RowDefinitions >
+						<RowDefinition/>
+						<RowDefinition/>
+						<RowDefinition/>
+						<RowDefinition/>
+						<RowDefinition/>
+						<RowDefinition/>
+						<RowDefinition/>
+					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition/>
+						<ColumnDefinition/>
+					</Grid.ColumnDefinitions>
+					<TextBlock Grid.Row="0">Модель</TextBlock>
+					<TextBlock Grid.Row="1">Объем данных</TextBlock>
+					<TextBlock Grid.Row="2">Колличество разделов</TextBlock>
+					<TextBlock Grid.Row="3">Колличество цилиндров</TextBlock>
+					<TextBlock Grid.Row="4">Колличество секторов</TextBlock>
+					<TextBlock Grid.Row="5">Серийный номер</TextBlock>
+					<TextBlock Grid.Row="6">Тип интерфейса</TextBlock>
 
-				<TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SelectedPhisicalDisk.Name, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
-				<TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedPhisicalDisk.Size,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
-				<TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedPhisicalDisk.Partitions,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
-				<TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelectedPhisicalDisk.TotalCylinders,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
-				<TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding SelectedPhisicalDisk.TotalSectors,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
-				<TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding SelectedPhisicalDisk.SerialNumber,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
-				<TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding SelectedPhisicalDisk.InterfaceType,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
-			</Grid>
-			<StackPanel VerticalAlignment="Top" Height="25" Background="#7ea0d6" Margin="0,338,0,0">
-				<TextBlock Height="26" VerticalAlignment="Top" Margin="5,0,0,0" FontSize="16">Логические диски</TextBlock>
+					<TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SelectedPhisicalDisk.Name, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+					<TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedPhisicalDisk.Size,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+					<TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedPhisicalDisk.Partitions,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+					<TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelectedPhisicalDisk.TotalCylinders,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+					<TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding SelectedPhisicalDisk.TotalSectors,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+					<TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding SelectedPhisicalDisk.SerialNumber,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+					<TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding SelectedPhisicalDisk.InterfaceType,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+				</Grid>
 			</StackPanel>
-			<ListBox Background="#c3d8fa" VerticalAlignment="Top" Margin="0,363,0,0" ItemsSource="{Binding SelectedPhisicalDisk.LogicalDisks,Mode=TwoWay}" SelectedItem="{Binding SelectedLogicalDisk, Mode=TwoWay}">
-				<ListBox.ItemTemplate>
-					<DataTemplate>
-						<StackPanel Orientation="Horizontal">
-							<TextBlock Text="{Binding Name}"></TextBlock>
-						</StackPanel>
-					</DataTemplate>
-				</ListBox.ItemTemplate>
-			</ListBox>
-			<Grid Height="190" VerticalAlignment="Top" Margin="5,489,0,0">
-				<Grid.RowDefinitions>
-					<RowDefinition/>
-					<RowDefinition/>
-					<RowDefinition/>
-					<RowDefinition/>
-					<RowDefinition/>
-					<RowDefinition/>
-					<RowDefinition/>
-				</Grid.RowDefinitions>
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition/>
-					<ColumnDefinition/>
-				</Grid.ColumnDefinitions>
-				<TextBlock Grid.Row="0">Название</TextBlock>
-				<TextBlock Grid.Row="1">Объем данных</TextBlock>
-				<TextBlock Grid.Row="2">Свободное место</TextBlock>
-				<TextBlock Grid.Row="3">Занятое место</TextBlock>
-				<TextBlock Grid.Row="4">Файловая система</TextBlock>
-				<TextBlock Grid.Row="5">Описание</TextBlock>
 
-				<TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SelectedLogicalDisk.Name, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
-				<TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedLogicalDisk.Size, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
-				<TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedLogicalDisk.FreeSpace, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
-				<TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelectedLogicalDisk.OccupiedPlace, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
-				<TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding SelectedLogicalDisk.FileSystem, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
-				<TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding SelectedLogicalDisk.Description, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
-			</Grid>
-			<StackPanel VerticalAlignment="Top" Height="30" Background="#7ea0d6" Margin="0,675,0,0">
-				<Button HorizontalAlignment="Left" FontSize="16" Command="{Binding DisplayStatisticsWindow}">Тест производительности</Button>
+
+			<StackPanel VerticalAlignment="Top"  Grid.Row="1" Margin="0,15,0,0">
+				<StackPanel Background="#7ea0d6">
+					<TextBlock Height="26" VerticalAlignment="Top" Margin="5,0,0,0" FontSize="16">Логические диски</TextBlock>
+				</StackPanel>
+
+				<ListBox Background="#c3d8fa" MinHeight="80" VerticalAlignment="Top" Margin="0,0,0,2" ItemsSource="{Binding SelectedPhisicalDisk.LogicalDisks,Mode=TwoWay}" SelectedItem="{Binding SelectedLogicalDisk, Mode=TwoWay}">
+					<ListBox.ItemTemplate>
+						<DataTemplate>
+							<StackPanel Orientation="Horizontal">
+								<TextBlock Text="{Binding Name}"></TextBlock>
+							</StackPanel>
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>
+				<Grid Height="190" VerticalAlignment="Top">
+					<Grid.RowDefinitions>
+						<RowDefinition/>
+						<RowDefinition/>
+						<RowDefinition/>
+						<RowDefinition/>
+						<RowDefinition/>
+						<RowDefinition/>
+						<RowDefinition/>
+					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition/>
+						<ColumnDefinition/>
+					</Grid.ColumnDefinitions>
+					<TextBlock Grid.Row="0">Название</TextBlock>
+					<TextBlock Grid.Row="1">Объем данных</TextBlock>
+					<TextBlock Grid.Row="2">Свободное место</TextBlock>
+					<TextBlock Grid.Row="3">Занятое место</TextBlock>
+					<TextBlock Grid.Row="4">Файловая система</TextBlock>
+					<TextBlock Grid.Row="5">Описание</TextBlock>
+
+					<TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SelectedLogicalDisk.Name, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+					<TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedLogicalDisk.Size, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+					<TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedLogicalDisk.FreeSpace, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+					<TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelectedLogicalDisk.OccupiedPlace, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+					<TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding SelectedLogicalDisk.FileSystem, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+					<TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding SelectedLogicalDisk.Description, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+				</Grid>
+				<StackPanel VerticalAlignment="Top" Height="30" Background="#7ea0d6">
+					<Button HorizontalAlignment="Left" Width="200" FontSize="16" Command="{Binding DisplayStatisticsWindow}">Тест производительности</Button>
+				</StackPanel>
 			</StackPanel>
 		</Grid>
 	</ScrollViewer>

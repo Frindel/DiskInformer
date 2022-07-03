@@ -8,6 +8,8 @@ using System.IO;
 using System.Collections.ObjectModel;
 using DiskInformer.Basic;
 using System.Text;
+using System.Diagnostics;
+using System;
 
 namespace DiskInformer.ViewModel
 {
@@ -62,12 +64,16 @@ namespace DiskInformer.ViewModel
 		{
 			get => new RelayCommand(()=>
 			{
+				_plotPoints.Clear();
+
 				//проверка существования файла
 				if (_testTypeAction == TestType.Read&&!File.Exists(_selectedLogicalDisk.Name+"\\\\FileForTestDisk"))
+				
 				{
 					//создание файла, необходимого для тестирования записи
-					using (StreamWriter sw = new StreamWriter(_selectedLogicalDisk.Name+ "\\\\FileForTestDisk",false,Encoding.ASCII))
+					using (StreamWriter sw = new StreamWriter(_selectedLogicalDisk.Name+ "\\\\FileForTestDisk",true,Encoding.ASCII))
 					{
+						//производится запись файла, размерностью 1 МБ с шагом в 8 байт
 						for (int i = 0; i < 131072; i++)
 						{
 							sw.Write(new string('t',8));
@@ -79,8 +85,11 @@ namespace DiskInformer.ViewModel
 				timer.AutoReset = true;
 				timer.Elapsed += (sender, e) =>
 				{
-					if (_plotPoints.Count != 100)
+					if (_plotPoints.Count == 10 || !_testActive)
+					{
 						((Timer)sender).Stop();
+						_testActive = false;
+					}
 					ChangePlot();
 				};
 				timer.Start();
@@ -89,11 +98,10 @@ namespace DiskInformer.ViewModel
 			},
 			()=> _selectedLogicalDisk != null);
 		}
-		public RelayCommand StopCommand
+		public RelayCommand StopTest
 		{
 			get => new RelayCommand(()=>
 			{
-				_plotPoints.Clear();
 				_testActive = false;
 			},
 			()=>_testActive);
@@ -113,8 +121,14 @@ namespace DiskInformer.ViewModel
 				foreach (LogicalDisk b in a.LogicalDisks)
 					_logicalDisks.Add(b);
 
+			if (_logicalDisks.Count > 0)
+				SelectedLogialDisk = _logicalDisks[0];
+
+			//настройка графика
 			WpfPlot plot = window.plot;
-			plot.Plot.SetOuterViewLimits(0, 100, 0, 500);
+			plot.Plot.SetOuterViewLimits(0, 10, 0, 500);
+			plot.Plot.YLabel("байт/c");
+			plot.Plot.XAxis.ManualTickSpacing(1);
 		}
 		#endregion
 
@@ -122,12 +136,19 @@ namespace DiskInformer.ViewModel
 		private async void ChangePlot()
 		{
 			//get current disk info
+			Stopwatch sv = new Stopwatch();
 			//тест чтения
 			if (_testTypeAction == TestType.Read)
 			{
 				using (StreamReader sr = new StreamReader(new FileStream(_selectedLogicalDisk.Name + "\\\\FileForTestDisk", FileMode.Open, FileAccess.Read)))
 				{
-					sr.Read(new char[8], 0, 8);
+					sv.Start();
+					//производится чтение файла, размерностью 1 МБ с шагом в 8 байт
+					for (int i = 0; i < 131072; i++)
+					{
+						sr.Read(new char[8], 0, 8);
+					}
+					sv.Stop();
 				}
 			}
 			//тест записи
@@ -135,20 +156,25 @@ namespace DiskInformer.ViewModel
 			{
 				using (StreamWriter sw = new StreamWriter(_selectedLogicalDisk.Name + "\\\\FileForTestDisk", false, Encoding.ASCII))
 				{
+					sv.Start();
+					//производится запись файла, размерностью 1 МБ с шагом в 8 байт
 					for (int i = 0; i < 131072; i++)
 					{
 						sw.Write(new string('t', 8));
 					}
+					sv.Stop();
 				}
 			}
+			double rez = 1048576 / sv.Elapsed.TotalMilliseconds * 0.001;
+			_plotPoints.Add(Math.Round(rez,1));
 
 			//edit plot
 			WpfPlot plot = _window.plot;
 			plot.Plot.Clear();
-			double[] dataX = _plotPoints.ToArray();
-			double[] dataY = new double[_plotPoints.Count];
+			double[] dataY = _plotPoints.ToArray();
+			double[] dataX = new double[_plotPoints.Count];
 			for (int i = 0; i < _plotPoints.Count; i++)
-				dataY[i] = i;
+				dataX[i] = i+1;
 
 			plot.Plot.AddScatter(dataX, dataY);
 

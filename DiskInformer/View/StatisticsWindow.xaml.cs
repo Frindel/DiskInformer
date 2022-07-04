@@ -6,10 +6,11 @@ namespace DiskInformer.View
 {
 	public partial class StatisticsWindow : Window
 	{
-		public StatisticsWindow(int updateTime, int dataSize, ICollection<PhisicalDisk> phisicalDisks)
+		//размер данных и шага представляют в килобайтах
+		public StatisticsWindow(int updateTime, int dataSize, int step, ICollection<PhisicalDisk> phisicalDisks)
 		{
 			InitializeComponent();
-			DataContext = new ViewModel.StatisticsWindowViewModel(this,updateTime,dataSize,phisicalDisks);
+			DataContext = new ViewModel.StatisticsWindowViewModel(this,updateTime,dataSize, step,phisicalDisks);
 		}
 	}
 }

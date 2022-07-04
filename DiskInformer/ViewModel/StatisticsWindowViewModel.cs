@@ -11,6 +11,7 @@ using System.IO;
 using System.Text;
 using System.Timers;
 using System.Linq;
+using System.Threading;
 
 namespace DiskInformer.ViewModel
 {
@@ -20,10 +21,14 @@ namespace DiskInformer.ViewModel
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
+		private const int ByteInKilobytes = 1024;
+
 		private StatisticsWindow _window;
 		private readonly int _updateTime;
 		//in kilobytes
 		private readonly int _dataSize;
+		private readonly int _step;
+
 		private ObservableCollection<LogicalDisk> _logicalDisks;
 		private LogicalDisk _selectedLogicalDisk;
 		private TestType _testTypeAction;
@@ -97,33 +102,34 @@ namespace DiskInformer.ViewModel
 			get => new RelayCommand(() =>
 			{
 				_plotPoints.Clear();
-				MaxSpeed = AvgSpeed=CurrentSpeed= 0;
+				MaxSpeed = AvgSpeed = CurrentSpeed = 0;
 
 				//проверка существования файла
-				if (_testTypeAction == TestType.Read && !File.Exists(_selectedLogicalDisk.Name + "\\\\FileForTestDisk"))
-
+				if (_testTypeAction == TestType.Read && 
+				(!File.Exists($"{_selectedLogicalDisk.Name}\\\\FileForTestDisk") ||
+				new FileInfo($"{_selectedLogicalDisk.Name}\\\\FileForTestDisk").Length!=_dataSize))
 				{
 					//создание файла, необходимого для тестирования записи
-					using (StreamWriter sw = new StreamWriter(_selectedLogicalDisk.Name + "\\\\FileForTestDisk", true, Encoding.ASCII))
+					using (StreamWriter sw = new StreamWriter($"{_selectedLogicalDisk.Name}\\\\FileForTestDisk", true, Encoding.ASCII))
 					{
-						//производится запись файла, размерностью 1 МБ с шагом в 8 байт
-						for (int i = 0; i < 131072; i++)
+						for (int i = 0; i < _dataSize/_step; i++)
 						{
-							sw.Write(new string('t', 8));
+							sw.Write(new string('t', ByteInKilobytes*_step));
 						}
 					}
 				}
 
-				Timer timer = new Timer(_updateTime * 1000);
+				System.Timers.Timer timer = new System.Timers.Timer(_updateTime * 1000);
 				timer.AutoReset = true;
 				timer.Elapsed += (sender, e) =>
 				{
-					if (_plotPoints.Count == 10 || !_testActive)
+					if (_plotPoints.Count == 20 || !_testActive)
 					{
-						((Timer)sender).Stop();
+						((System.Timers.Timer)sender).Stop();
 						_testActive = false;
 						return;
 					}
+					if (!FileBusy($"{_selectedLogicalDisk.Name}\\\\FileForTestDisk"))
 					ChangePlot();
 				};
 				timer.Start();
@@ -143,13 +149,14 @@ namespace DiskInformer.ViewModel
 		#endregion
 
 		#region constructors
-		public StatisticsWindowViewModel(StatisticsWindow window, int updateTime, int dataSize, ICollection<PhisicalDisk> phisicalDisks)
+		public StatisticsWindowViewModel(StatisticsWindow window, int updateTime, int dataSize, int step, ICollection<PhisicalDisk> phisicalDisks)
 		{
 			_testActive = false;
 			_plotPoints = new List<double>();
 			_window = window;
 			_updateTime = updateTime;
 			_dataSize = dataSize;
+			_step = step;
 			_logicalDisks = new ObservableCollection<LogicalDisk>();
 			foreach (PhisicalDisk a in phisicalDisks)
 				foreach (LogicalDisk b in a.LogicalDisks)
@@ -162,14 +169,14 @@ namespace DiskInformer.ViewModel
 
 			//настройка графика
 			WpfPlot plot = window.plot;
-			plot.Plot.SetOuterViewLimits(0, 10, 0, 500);
-			plot.Plot.YLabel("байт/c");
+			plot.Plot.SetOuterViewLimits(0, 20.5, 0, 500);
+			plot.Plot.YLabel("МБ/c");
 			plot.Plot.XAxis.ManualTickSpacing(1);
 		}
 		#endregion
 
 		#region protected methods
-		private async void ChangePlot()
+		private void ChangePlot()
 		{
 			//get current disk info
 			Stopwatch sv = new Stopwatch();
@@ -179,10 +186,12 @@ namespace DiskInformer.ViewModel
 				using (StreamReader sr = new StreamReader(new FileStream(_selectedLogicalDisk.Name + "\\\\FileForTestDisk", FileMode.Open, FileAccess.Read)))
 				{
 					sv.Start();
+
+					char[] buffer = new char[ByteInKilobytes * _step];
 					//производится чтение файла, размерностью 1 МБ с шагом в 8 байт
-					for (int i = 0; i < 131072; i++)
+					for (int i = 0; i < _dataSize / _step; i++)
 					{
-						sr.Read(new char[8], 0, 8);
+						sr.Read(buffer, 0, ByteInKilobytes * _step);
 					}
 					sv.Stop();
 				}
@@ -194,17 +203,17 @@ namespace DiskInformer.ViewModel
 				{
 					sv.Start();
 					//производится запись файла, размерностью 1 МБ с шагом в 8 байт
-					for (int i = 0; i < 131072; i++)
+					for (int i = 0; i < _dataSize / _step; i++)
 					{
-						sw.Write(new string('t', 8));
+						sw.Write(new string('t', ByteInKilobytes * _step));
 					}
 					sv.Stop();
 				}
 			}
-			double rez = 1048576 / sv.Elapsed.TotalMilliseconds * 0.001;
-			_plotPoints.Add(Math.Round(rez, 2));
+			double rez = Math.Round((_dataSize/1024) / (sv.ElapsedMilliseconds * 0.001),2);
+			_plotPoints.Add(rez);
 
-			CurrentSpeed = Math.Round(rez, 2);
+			CurrentSpeed = rez;
 			if (MaxSpeed<CurrentSpeed)
 				MaxSpeed = CurrentSpeed;
 
@@ -222,6 +231,20 @@ namespace DiskInformer.ViewModel
 			plot.Plot.AddScatter(dataX, dataY);
 
 			_window.Dispatcher.Invoke(() => plot.Refresh());
+		}
+
+		private bool FileBusy(string path)
+		{
+			try
+			{
+				StreamWriter sw = new StreamWriter(path);
+				sw.Close();
+				return false;
+			}
+			catch (IOException)
+			{
+				return true;
+			}
 		}
 		private void OnPropertyChanged(string propertyName)
 		{

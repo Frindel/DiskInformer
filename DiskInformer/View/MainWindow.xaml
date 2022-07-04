@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DiskInformer"
         mc:Ignorable="d"
-        Title="DiskInformer" Height="450" Width="800">
+        Title="Disk informer" Height="450" Width="800">
 	<Window.Resources>
 		<Style TargetType="Button">
 			<Setter Property="Background" Value="White"></Setter>
@@ -51,7 +51,7 @@
 						<ColumnDefinition/>
 					</Grid.ColumnDefinitions>
 					<TextBlock Grid.Row="0">Модель</TextBlock>
-					<TextBlock Grid.Row="1">Объем данных</TextBlock>
+					<TextBlock Grid.Row="1">Объем данных (ГБ)</TextBlock>
 					<TextBlock Grid.Row="2">Колличество разделов</TextBlock>
 					<TextBlock Grid.Row="3">Колличество цилиндров</TextBlock>
 					<TextBlock Grid.Row="4">Колличество секторов</TextBlock>
@@ -98,9 +98,9 @@
 						<ColumnDefinition/>
 					</Grid.ColumnDefinitions>
 					<TextBlock Grid.Row="0">Название</TextBlock>
-					<TextBlock Grid.Row="1">Объем данных</TextBlock>
-					<TextBlock Grid.Row="2">Свободное место</TextBlock>
-					<TextBlock Grid.Row="3">Занятое место</TextBlock>
+					<TextBlock Grid.Row="1">Объем данных (ГБ)</TextBlock>
+					<TextBlock Grid.Row="2">Свободное место (ГБ)</TextBlock>
+					<TextBlock Grid.Row="3">Занятое место (ГБ)</TextBlock>
 					<TextBlock Grid.Row="4">Файловая система</TextBlock>
 					<TextBlock Grid.Row="5">Описание</TextBlock>
 

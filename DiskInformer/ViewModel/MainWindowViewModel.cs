@@ -15,6 +15,7 @@ namespace DiskInformer.ViewModel
 		private ObservableCollection<PhisicalDisk> _phisicalDisks;
 		private PhisicalDisk _selectedPhisicalDisk;
 		private LogicalDisk _selectedLogicalDisk;
+
 		#region property
 		public ObservableCollection<PhisicalDisk> PhisicalDisks
 		{
@@ -44,12 +45,13 @@ namespace DiskInformer.ViewModel
 			}
 		}
 		#endregion
+
 		#region Commands
 		public RelayCommand DisplayStatisticsWindow
 		{
 			get => new RelayCommand(() =>
 			{
-				View.StatisticsWindow statisticsWindow = new View.StatisticsWindow(5, 102400,256,_phisicalDisks);
+				View.StatisticsWindow statisticsWindow = new View.StatisticsWindow(1, 1024,128,_phisicalDisks);
 				statisticsWindow.Show();
 				statisticsWindow.Focus();
 			});
@@ -60,7 +62,10 @@ namespace DiskInformer.ViewModel
 		public MainWindowViewModel()
 		{
 			_phisicalDisks = new ObservableCollection<PhisicalDisk>();
+			//получение информации о дисках устройства
 			GetDisksInfo();
+
+			//выделение первых дисков в списках
 			if (_phisicalDisks.Count != 0)
 				SelectedPhisicalDisk = _phisicalDisks[0];
 			if (SelectedPhisicalDisk.LogicalDisks.Count != 0)

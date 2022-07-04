@@ -26,20 +26,20 @@ Title="Disk informer" Height="455" Width="1000">
 				<WpfPlot HorizontalAlignment="Left" Height="300" Width="800" x:Name="plot"/>
 				<StackPanel HorizontalAlignment="Right" Width="200" Margin="0,30">
 					<TextBlock Width="200" FontSize="16" >Текущая скорость:</TextBlock>
-					<WrapPanel>
-						<TextBlock Text="{Binding CurrentSpeed}" Width="200" FontSize="16"></TextBlock>
-						<TextBlock Text="МБ/с"/>
-					</WrapPanel>
+					<DockPanel>
+						<TextBlock Text="{Binding CurrentSpeed}" FontSize="16"></TextBlock>
+						<TextBlock Text=" МБ/с" FontSize="16"/>
+					</DockPanel>
 					<TextBlock FontSize="16">Средняя скорость:</TextBlock>
-					<WrapPanel>
-						<TextBlock Text="{Binding AvgSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="200" FontSize="16"></TextBlock>
-						<TextBlock Text="МБ/c"/>
-					</WrapPanel>
+					<DockPanel>
+						<TextBlock Text="{Binding AvgSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" FontSize="16"></TextBlock>
+						<TextBlock Text=" МБ/c" FontSize="16"/>
+					</DockPanel>
 					<TextBlock FontSize="16">Максимальная скорость:</TextBlock>
-					<WrapPanel>
-						<TextBlock Text="{Binding MaxSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="200" FontSize="16"></TextBlock>
-						<TextBlock Text="МБ/с"/>
-					</WrapPanel>
+					<DockPanel>
+						<TextBlock Text="{Binding MaxSpeed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" FontSize="16"></TextBlock>
+						<TextBlock Text=" МБ/с" FontSize="16"/>
+					</DockPanel>
 				</StackPanel>
 			</Grid>
 			<WrapPanel Height="40" Background="#7ea0d6">

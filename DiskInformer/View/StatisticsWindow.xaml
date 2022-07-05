@@ -4,7 +4,6 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 xmlns:local="clr-namespace:DiskInformer.View"
-xmlns:l="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
 xmlns:b="clr-namespace:DiskInformer.Basic.Converters"
 mc:Ignorable="d"
 Title="Disk informer" Height="455" Width="1000">

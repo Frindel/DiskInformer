@@ -38,6 +38,7 @@ namespace DiskInformer.ViewModel
 		private double _avgSpeed;
 
 		private string _fileURI;
+
 		#region property
 		public double MaxSpeed
 		{
@@ -129,6 +130,8 @@ namespace DiskInformer.ViewModel
 					for (int i = 0; i < 20; i++)
 					{
 						while (Monitor.IsEntered(this)) { }
+						if (!_testActive)
+							return;
 							ChangePlot();
 						Task.Delay(_updateTime * 1000).Wait();
 					}

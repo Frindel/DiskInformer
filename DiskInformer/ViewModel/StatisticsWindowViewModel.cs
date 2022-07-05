@@ -9,7 +9,8 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DiskInformer.ViewModel
 {
@@ -19,7 +20,7 @@ namespace DiskInformer.ViewModel
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
-		private const int ByteInKilobytes = 1024;
+		private const int bytesInKilobytes = 1024;
 
 		private StatisticsWindow _window;
 		private readonly int _updateTime;
@@ -36,6 +37,7 @@ namespace DiskInformer.ViewModel
 		private double _currentSpeed;
 		private double _avgSpeed;
 
+		private string _fileURI;
 		#region property
 		public double MaxSpeed
 		{
@@ -96,45 +98,43 @@ namespace DiskInformer.ViewModel
 		#region Command
 		public RelayCommand StartTest
 		{
-			get => new RelayCommand(() =>
+			get => new RelayCommand(async () =>
 			{
 				_plotPoints.Clear();
 				MaxSpeed = AvgSpeed = CurrentSpeed = 0;
 
 				//проверка существования файла
-				if (_testTypeAction == TestType.Read &&
-				(!File.Exists($"{_selectedLogicalDisk.Name}\\\\FileForTestDisk") ||
-				new FileInfo($"{_selectedLogicalDisk.Name}\\\\FileForTestDisk").Length != _dataSize))
+				if (_testTypeAction == TestType.Read)
 				{
 					//создание файла, необходимого для тестирования записи
-					using (StreamWriter sw = new StreamWriter($"{_selectedLogicalDisk.Name}\\\\FileForTestDisk", true, Encoding.ASCII))
+					string systemDisk = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+					if (systemDisk== _selectedLogicalDisk.Name + "\\")
+						_fileURI = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FileForTestDisk");
+					else 
+						_fileURI = Path.Combine(_selectedLogicalDisk.Name+"\\\\", "FileForTestDisk");
+
+					using (FileStream fs = new FileStream(_fileURI, FileMode.Create, FileAccess.ReadWrite, FileShare.None, _step, (FileOptions)0x20000000))
 					{
-						for (int i = 0; i < _dataSize / _step; i++)
-						{
-							sw.Write(new string('t', ByteInKilobytes * _step));
-						}
+						byte[] writingValues = new byte[bytesInKilobytes * _dataSize];
+
+						new Random().NextBytes(writingValues);
+						fs.Write(writingValues, 0, writingValues.Length);
 					}
 				}
 
-				System.Timers.Timer timer = new System.Timers.Timer(_updateTime * 1000);
-				timer.AutoReset = true;
-				timer.Elapsed += (sender, e) =>
-				{
-					//условие завершения работы теста
-					if (_plotPoints.Count == 20 || !_testActive)
-					{
-						((System.Timers.Timer)sender).Stop();
-						_testActive = false;
-						return;
-					}
-
-					//проверка на отсутствие подключений к тестируемому файлу
-					if (!FileBusy($"{_selectedLogicalDisk.Name}\\\\FileForTestDisk"))
-						ChangePlot();
-				};
-				timer.Start();
-
 				_testActive = true;
+
+				await Task.Run(() =>
+				{
+					for (int i = 0; i < 20; i++)
+					{
+						while (Monitor.IsEntered(this)) { }
+							ChangePlot();
+						Task.Delay(_updateTime * 1000).Wait();
+					}
+					_testActive = false;
+				});
+
 			},
 			() => !_testActive && _selectedLogicalDisk != null);
 		}
@@ -172,7 +172,7 @@ namespace DiskInformer.ViewModel
 
 			//настройка графика
 			WpfPlot plot = window.plot;
-			plot.Plot.SetOuterViewLimits(0, 20.5, 0, 500);
+			plot.Plot.SetOuterViewLimits(0, 20.5, 0, 5000);
 			plot.Plot.YLabel("МБ/c");
 			plot.Plot.XAxis.ManualTickSpacing(1);
 		}
@@ -182,44 +182,53 @@ namespace DiskInformer.ViewModel
 		private void ChangePlot()
 		{
 			//получение информации о выделенном локальном диске
-			Stopwatch sv = new Stopwatch();
+			Stopwatch sw = new Stopwatch();
 			//тест чтения
 			if (_testTypeAction == TestType.Read)
 			{
-				using (StreamReader sr = new StreamReader(new FileStream(_selectedLogicalDisk.Name + "\\\\FileForTestDisk", FileMode.Open, FileAccess.Read), Encoding.ASCII))
+				Monitor.Enter(this);
+				try
 				{
-
-					char[] buffer = new char[3];
-
-					sv.Start();
-
-					for (int i = 0; i < _dataSize / 3; i++)
+					using (FileStream fs = new FileStream(_fileURI, FileMode.Open, FileAccess.Read, FileShare.None, 4096, (FileOptions)0x20000000))
 					{
-						sr.Read(buffer, 0, 3);
+						byte[] buffer = new byte[fs.Length];
+
+						sw.Restart();
+
+						fs.Read(buffer, 0, (int)fs.Length);
 					}
-					sv.Stop();
+					sw.Stop();
+				}
+				finally
+				{
+					Monitor.Exit(this);
 				}
 			}
 			//тест записи
 			if (_testTypeAction == TestType.Write)
 			{
-				using (StreamWriter sw = new StreamWriter(_selectedLogicalDisk.Name + "\\\\FileForTestDisk", false, Encoding.ASCII))
+				Monitor.Enter(this);
+				try
 				{
-
-					string recordedValue = new string('t', ByteInKilobytes * _step);
-
-					sv.Start();
-
-					for (int i = 0; i < _dataSize / _step; i++)
+					using (FileStream fs = new FileStream(_fileURI, FileMode.Create, FileAccess.Write, FileShare.None, 4096, (FileOptions)0x20000000 | FileOptions.WriteThrough))
 					{
-						sw.Write(recordedValue);
+						byte[] writingValues = new byte[bytesInKilobytes * _dataSize];
+						new Random().NextBytes(writingValues);
+
+						sw.Restart();
+
+						fs.Write(writingValues, 0, writingValues.Length);
 					}
-					sv.Stop();
+					sw.Stop();
+				}
+				finally
+				{
+					Monitor.Exit(this);
 				}
 			}
 
 			//подсчет скорости
-			double rez = Math.Round((_dataSize / 1024) / (sv.ElapsedMilliseconds * 0.001), 2);
+			double rez = Math.Round((_dataSize / 1024) / (sw.ElapsedMilliseconds * 0.001), 2);
 
 			_plotPoints.Add(rez);
 			CurrentSpeed = rez;
@@ -238,20 +247,6 @@ namespace DiskInformer.ViewModel
 			plot.Plot.AddScatter(dataX, dataY);
 
 			_window.Dispatcher.Invoke(() => plot.Refresh());
-		}
-		
-		private bool FileBusy(string path)
-		{
-			try
-			{
-				StreamWriter sw = new StreamWriter(path);
-				sw.Close();
-				return false;
-			}
-			catch (IOException)
-			{
-				return true;
-			}
 		}
 		private void OnPropertyChanged(string propertyName)
 		{

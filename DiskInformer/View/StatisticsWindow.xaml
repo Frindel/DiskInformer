@@ -51,5 +51,5 @@ Title="Disk informer" Height="455" Width="1000">
 				<Button Content="Стоп" Width="100" Command="{Binding StopTest}"/>
 			</WrapPanel>
 		</StackPanel>
-	</Grid>
+	</Grid>	
 </Window>

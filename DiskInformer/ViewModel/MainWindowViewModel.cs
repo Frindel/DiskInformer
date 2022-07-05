@@ -51,7 +51,7 @@ namespace DiskInformer.ViewModel
 		{
 			get => new RelayCommand(() =>
 			{
-				View.StatisticsWindow statisticsWindow = new View.StatisticsWindow(1, 1024,128,_phisicalDisks);
+				View.StatisticsWindow statisticsWindow = new View.StatisticsWindow(1, 102400, 4096,_phisicalDisks);
 				statisticsWindow.Show();
 				statisticsWindow.Focus();
 			});
